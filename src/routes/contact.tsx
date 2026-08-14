@@ -55,6 +55,7 @@ function Contact() {
   const [details, setDetails] = useState("");
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
+  const sendLead = useServerFn(submitLead);
 
   const toggle = (item: string) =>
     setSelected((prev) => (prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]));
@@ -66,18 +67,22 @@ function Contact() {
       return;
     }
     setSending(true);
-    const { error } = await supabase.from("leads").insert({
-      name: name.trim(),
-      email: email.trim(),
-      interests: selected,
-      budget: budget || null,
-      message: details.trim(),
-    });
-    setSending(false);
-    if (error) {
+    try {
+      await sendLead({
+        data: {
+          name: name.trim(),
+          email: email.trim(),
+          interests: selected,
+          budget: budget || null,
+          message: details.trim(),
+        },
+      });
+    } catch {
+      setSending(false);
       toast.error("Something went wrong. Please email us directly.");
       return;
     }
+    setSending(false);
     setDone(true);
     toast.success("Thanks! We'll get back to you within one business day.");
     setName("");
@@ -86,6 +91,7 @@ function Contact() {
     setSelected([]);
     setBudget("");
   };
+
 
   return (
     <main className="relative px-5 pb-24 pt-16 lg:px-8">
