@@ -45,8 +45,6 @@ const values = [
   },
 ];
 
-export default About;
-
 function About() {
   return (
     <main className="relative pb-24 pt-16">
