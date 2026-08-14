@@ -43,6 +43,81 @@ function Marquee() {
   );
 }
 
+const scenes = [
+  { bg: "bg-scene-1", label: "Websites", caption: "Experience real estate agility" },
+  { bg: "bg-scene-2", label: "SaaS", caption: "Dashboards people actually enjoy" },
+  { bg: "bg-scene-3", label: "E-commerce", caption: "Stores built to convert" },
+  { bg: "bg-scene-4", label: "Automation", caption: "Work that runs itself" },
+];
+
+/** Auto-cycling showreel like the reference video: scenes crossfade with a slow zoom. */
+function HeroReel() {
+  const [i, setI] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setI((n) => (n + 1) % scenes.length), 3400);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="shadow-soft relative aspect-[16/8] w-full overflow-hidden rounded-[2rem] bg-ink">
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={i}
+          className={`absolute inset-0 ${scenes[i].bg}`}
+          initial={{ opacity: 0, scale: 1.16, filter: "blur(10px)" }}
+          animate={{ opacity: 1, scale: 1.02, filter: "blur(0px)" }}
+          exit={{ opacity: 0, scale: 1, filter: "blur(6px)" }}
+          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="absolute inset-0 grid place-items-center px-8 text-center">
+            <div>
+              <motion.p
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.6 }}
+                className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-ink-foreground/70"
+              >
+                {scenes[i].label}
+              </motion.p>
+              <span className="mt-4 block overflow-hidden">
+                <motion.span
+                  className="font-display block text-2xl font-bold text-ink-foreground sm:text-4xl lg:text-5xl"
+                  initial={{ y: "110%", rotate: 3 }}
+                  animate={{ y: "0%", rotate: 0 }}
+                  transition={{ delay: 0.15, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {scenes[i].caption}
+                </motion.span>
+              </span>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+        {scenes.map((s, idx) => (
+          <button
+            key={s.label}
+            type="button"
+            aria-label={s.label}
+            onClick={() => setI(idx)}
+            className="h-1 w-10 overflow-hidden rounded-full bg-ink-foreground/25"
+          >
+            <motion.span
+              className="block h-full bg-ink-foreground/90"
+              initial={false}
+              animate={{ scaleX: idx === i ? 1 : 0 }}
+              style={{ originX: 0 }}
+              transition={{ duration: idx === i ? 3.4 : 0.3, ease: "linear" }}
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -104,23 +179,15 @@ function Hero() {
         </motion.div>
       </div>
 
-      <motion.div
-        style={{ scale, y }}
-        className="mx-auto mt-16 w-full max-w-6xl"
-      >
-        <MaskReveal className="shadow-soft aspect-[16/8] w-full rounded-[2rem] bg-ink">
-          <div className="bg-brand relative h-full w-full opacity-90">
-            <div className="absolute inset-0 grid place-items-center px-8 text-center">
-              <p className="font-display text-2xl font-bold text-ink-foreground sm:text-4xl lg:text-5xl">
-                <Chars text="Design that performs. Code that lasts." />
-              </p>
-            </div>
-          </div>
+      <motion.div style={{ scale, y }} className="mx-auto mt-16 w-full max-w-6xl">
+        <MaskReveal className="rounded-[2rem]">
+          <HeroReel />
         </MaskReveal>
       </motion.div>
     </section>
   );
 }
+
 
 function Faq() {
   const [open, setOpen] = useState<number | null>(0);
