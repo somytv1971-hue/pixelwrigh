@@ -78,7 +78,12 @@
   --fuchsia: oklch(0.66 0.27 337);
   --cyan: oklch(0.8 0.13 200);
   --gradient-brand: linear-gradient(120deg, oklch(0.48 0.26 288), oklch(0.62 0.27 330) 55%, oklch(0.83 0.12 200));
+  --gradient-scene-1: linear-gradient(135deg, oklch(0.42 0.24 285), oklch(0.6 0.26 322) 60%, oklch(0.8 0.14 205));
+  --gradient-scene-2: linear-gradient(200deg, oklch(0.3 0.14 270), oklch(0.55 0.2 250) 55%, oklch(0.82 0.11 195));
+  --gradient-scene-3: linear-gradient(150deg, oklch(0.2 0.05 290), oklch(0.4 0.18 320) 60%, oklch(0.72 0.2 350));
+  --gradient-scene-4: linear-gradient(110deg, oklch(0.55 0.22 340), oklch(0.72 0.19 60) 55%, oklch(0.9 0.11 90));
   --shadow-soft: 0 24px 60px -30px oklch(0.52 0.25 296 / 0.35);
+
   --sidebar: oklch(0.99 0.004 300);
   --sidebar-foreground: oklch(0.14 0.015 290);
   --sidebar-primary: oklch(0.52 0.25 296);
@@ -167,6 +172,23 @@
 @utility bg-brand {
   background: var(--gradient-brand);
 }
+
+@utility bg-scene-1 {
+  background: var(--gradient-scene-1);
+}
+
+@utility bg-scene-2 {
+  background: var(--gradient-scene-2);
+}
+
+@utility bg-scene-3 {
+  background: var(--gradient-scene-3);
+}
+
+@utility bg-scene-4 {
+  background: var(--gradient-scene-4);
+}
+
 
 @utility shadow-soft {
   box-shadow: var(--shadow-soft);
