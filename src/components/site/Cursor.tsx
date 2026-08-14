@@ -76,7 +76,7 @@ export function Cursor() {
       />
       <span
         ref={labelRef}
-        className="absolute left-0 top-0 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-ink-foreground opacity-0 transition-opacity duration-200"
+        className="absolute left-0 top-0 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-ink opacity-0 transition-opacity duration-200"
       />
       <div
         ref={dotRef}
