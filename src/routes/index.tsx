@@ -64,9 +64,7 @@ function Hero() {
         <h1 className="display-xl text-[3rem] sm:text-[4.5rem] lg:text-[6rem]">
           <Words text="Digital design &" />
           <br />
-          <span className="text-gradient">
-            <Words text="development agency" />
-          </span>
+          <Words text="development agency" className="text-gradient" />
         </h1>
         <motion.p
           initial={{ opacity: 0, y: 16 }}

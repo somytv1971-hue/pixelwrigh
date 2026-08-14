@@ -54,9 +54,7 @@ function About() {
         <h1 className="display-xl text-5xl sm:text-7xl lg:text-8xl">
           <Words text="We build brands" />
           <br />
-          <span className="text-gradient">
-            <Words text="that feel alive" />
-          </span>
+          <Words text="that feel alive" className="text-gradient" />
         </h1>
         <p className="mt-8 max-w-2xl text-lg text-muted-foreground">
           {site.name} is a design and development studio in {site.office}. We work with founders and marketing

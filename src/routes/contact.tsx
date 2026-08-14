@@ -92,9 +92,7 @@ function Contact() {
         <h1 className="display-xl text-5xl sm:text-7xl lg:text-8xl">
           <Words text="Hey! Tell us all" />
           <br />
-          <span className="text-gradient">
-            <Words text="the things" />
-          </span>
+          <Words text="the things" className="text-gradient" />
         </h1>
 
         <form onSubmit={submit} className="mt-16 space-y-14">
