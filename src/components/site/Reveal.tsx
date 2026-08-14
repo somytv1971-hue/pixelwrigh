@@ -40,7 +40,6 @@ export function Words({
 }) {
   return (
     <motion.span
-      className={className}
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, margin: "-12%" }}
@@ -49,7 +48,7 @@ export function Words({
       {text.split(" ").map((word, i) => (
         <span key={`${word}-${i}`} className="inline-block overflow-hidden pb-[0.08em] align-bottom">
           <motion.span
-            className="inline-block"
+            className={`inline-block ${className ?? ""}`}
             variants={{
               hidden: { y: "115%", rotate: 4, opacity: 0 },
               show: { y: "0%", rotate: 0, opacity: 1 },
