@@ -173,6 +173,23 @@
   background: var(--gradient-brand);
 }
 
+@utility bg-scene-1 {
+  background: var(--gradient-scene-1);
+}
+
+@utility bg-scene-2 {
+  background: var(--gradient-scene-2);
+}
+
+@utility bg-scene-3 {
+  background: var(--gradient-scene-3);
+}
+
+@utility bg-scene-4 {
+  background: var(--gradient-scene-4);
+}
+
+
 @utility shadow-soft {
   box-shadow: var(--shadow-soft);
 }
