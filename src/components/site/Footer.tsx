@@ -16,12 +16,15 @@ export function Footer() {
           <h2 className="display-xl text-4xl sm:text-6xl lg:text-7xl">
             <Words text="Have an idea?" />
           </h2>
-          <Link
-            to="/contact"
-            className="display-xl mt-2 inline-block border-b-2 border-white/60 text-4xl transition-colors hover:border-white sm:text-6xl lg:text-7xl"
-          >
-            Tell us about it
-          </Link>
+          <Magnetic className="mt-2 inline-block" strength={0.28}>
+            <Link
+              to="/contact"
+              data-cursor-label="Talk"
+              className="display-xl inline-block border-b-2 border-white/60 text-4xl transition-colors hover:border-white sm:text-6xl lg:text-7xl"
+            >
+              Tell us about it
+            </Link>
+          </Magnetic>
         </div>
       </div>
 
