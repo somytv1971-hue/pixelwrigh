@@ -190,6 +190,75 @@ function Hero() {
 }
 
 
+/** Trusted by our clients: staggered testimonial cards + credibility stats. */
+function Clients() {
+  return (
+    <section className="overflow-hidden px-5 py-24 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <Reveal>
+          <h2 className="display-xl text-center text-4xl sm:text-6xl lg:text-7xl">
+            <Words text="Trusted by our clients" />
+          </h2>
+        </Reveal>
+
+        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {testimonials.map((t, i) => (
+            <Parallax key={t.client} amount={i % 2 === 1 ? 42 : 14}>
+              <Reveal delay={i * 0.08}>
+                <Tilt>
+                  <figure
+                    className={`flex h-full flex-col justify-between rounded-[1.75rem] border border-border p-7 transition-shadow duration-500 hover:shadow-soft ${
+                      i % 2 === 1 ? "bg-secondary/70" : "bg-background"
+                    } ${i % 2 === 1 ? "md:mt-10" : ""}`}
+                  >
+                    <span className="font-display block text-5xl leading-none text-muted-foreground/50">”</span>
+                    <blockquote className="mt-4 text-sm leading-relaxed text-foreground/80">{t.quote}</blockquote>
+                    <figcaption className="mt-8">
+                      <p className="font-display text-xl font-bold">{t.client}</p>
+                      <p className="mt-1 text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground">
+                        {t.role}
+                      </p>
+                    </figcaption>
+                  </figure>
+                </Tilt>
+              </Reveal>
+            </Parallax>
+          ))}
+        </div>
+
+        <div className="mt-24 border-t border-border pt-10">
+          <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Why {site.name}
+            </p>
+            <Reveal>
+              <p className="max-w-2xl text-lg leading-relaxed sm:text-xl">{whyCopy}</p>
+            </Reveal>
+          </div>
+
+          <div className="mt-14 grid gap-4 md:grid-cols-3">
+            {clientStats.map((s, i) => (
+              <Reveal key={s.label} delay={i * 0.07}>
+                <div
+                  className={`h-full rounded-[1.75rem] p-8 ${
+                    i === 1 ? "bg-background border border-border" : "bg-secondary/70"
+                  }`}
+                >
+                  <span className="bg-brand block h-2 w-2 rounded-full" />
+                  <p className="font-display mt-10 text-4xl font-bold sm:text-5xl">{s.value}</p>
+                  <p className="mt-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    {s.label}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Faq() {
   const [open, setOpen] = useState<number | null>(0);
   return (
