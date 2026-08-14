@@ -87,7 +87,7 @@ function About() {
             {values.map((v, i) => (
               <Reveal key={v.t} delay={i * 0.05}>
                 <div className="group relative h-full overflow-hidden rounded-3xl border border-border p-7 transition-transform duration-500 hover:-translate-y-1.5">
-                  <span className="bg-brand absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100" />
+                  <span className="bg-brand absolute inset-x-0 bottom-0 h-1 -translate-x-full transition-transform duration-500 group-hover:translate-x-0" />
                   <h3 className="text-xl font-semibold">{v.t}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{v.d}</p>
                 </div>
@@ -115,7 +115,7 @@ function About() {
             data-cursor-label="Go"
             className="bg-ink group relative inline-flex items-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-ink-foreground"
           >
-            <span className="bg-brand absolute inset-0 origin-bottom scale-y-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100" />
+            <span className="bg-brand absolute inset-0 translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
             <span className="relative">Work with us</span>
             <ArrowRight className="relative h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>

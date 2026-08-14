@@ -87,7 +87,7 @@ function Hero() {
               data-cursor-label="Go"
               className="bg-ink group relative flex items-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-ink-foreground"
             >
-              <span className="bg-brand absolute inset-0 origin-bottom scale-y-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100" />
+              <span className="bg-brand absolute inset-0 translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
               <span className="relative">Start a project</span>
               <ArrowRight className="relative h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
@@ -97,7 +97,7 @@ function Hero() {
               to="/our-work"
               className="group relative flex items-center overflow-hidden rounded-full border border-border px-7 py-3.5 text-sm font-semibold"
             >
-              <span className="absolute inset-0 origin-bottom scale-y-0 bg-secondary transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100" />
+              <span className="absolute inset-0 translate-y-full bg-secondary transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
               <span className="relative">See our work</span>
             </Link>
           </Magnetic>
@@ -207,7 +207,7 @@ function Index() {
                   data-cursor-label="Open"
                   className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-border bg-background p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-soft"
                 >
-                  <span className="bg-brand absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
+                  <span className="bg-brand absolute inset-x-0 bottom-0 h-1 -translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0" />
                   <div>
                     <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                       0{i + 1}
