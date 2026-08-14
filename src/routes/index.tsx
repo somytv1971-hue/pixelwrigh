@@ -261,6 +261,10 @@ function Index() {
         </div>
       </section>
 
+      <Clients />
+
+
+
       <section className="bg-secondary/50 px-5 py-24 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <Reveal>
