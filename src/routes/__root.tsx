@@ -130,6 +130,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Cursor />
+      {!bare && <PageTransition routeKey={pathname} />}
       {!bare && <Navbar />}
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
