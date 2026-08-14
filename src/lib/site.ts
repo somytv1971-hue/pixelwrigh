@@ -1,11 +1,11 @@
 export const site = {
-  name: "Nuvora",
+  name: "Pixelwright",
   tagline: "Digital design & development agency",
   email: "mdradyan30@gmail.com",
   phone: "01568793292",
   office: "Dhaka, Bangladesh",
   officeLabel: "MAIN OFFICE",
-  year: new Date().getFullYear(),
+  year: 2026,
   socials: [
     { label: "Dribbble", href: "https://dribbble.com" },
     { label: "GitHub", href: "https://github.com" },
