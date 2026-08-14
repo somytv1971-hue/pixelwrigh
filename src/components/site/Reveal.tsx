@@ -49,7 +49,7 @@ export function Words({
       {text.split(" ").map((word, i) => (
         <span key={`${word}-${i}`} className="inline-block overflow-hidden pb-[0.08em] align-bottom">
           <motion.span
-            className="inline-block will-change-transform"
+            className="inline-block"
             variants={{
               hidden: { y: "115%", rotate: 4, opacity: 0 },
               show: { y: "0%", rotate: 0, opacity: 1 },
@@ -99,6 +99,7 @@ export function MaskReveal({ children, className }: { children: ReactNode; class
       viewport={{ once: true, margin: "-10%" }}
     >
       <motion.div
+        className="h-full w-full"
         variants={{ hidden: { scale: 1.14 }, show: { scale: 1 } }}
         transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
       >
