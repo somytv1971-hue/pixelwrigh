@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Cursor } from "@/components/site/Cursor";
+import { PageTransition } from "@/components/site/Motion";
 import { Toaster } from "@/components/ui/sonner";
 import { site } from "@/lib/site";
 
@@ -130,6 +131,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Cursor />
+      {!bare && <PageTransition routeKey={pathname} />}
       {!bare && <Navbar />}
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />

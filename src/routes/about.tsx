@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { Blobs, Reveal, Words } from "@/components/site/Reveal";
+import { Blobs, Reveal, Words, MaskReveal, Chars } from "@/components/site/Reveal";
+import { Magnetic, Parallax } from "@/components/site/Motion";
 import { processSteps, site } from "@/lib/site";
 
 export const Route = createFileRoute("/about")({
@@ -53,9 +54,7 @@ function About() {
         <h1 className="display-xl text-5xl sm:text-7xl lg:text-8xl">
           <Words text="We build brands" />
           <br />
-          <span className="text-gradient">
-            <Words text="that feel alive" />
-          </span>
+          <Words text="that feel alive" className="text-gradient" />
         </h1>
         <p className="mt-8 max-w-2xl text-lg text-muted-foreground">
           {site.name} is a design and development studio in {site.office}. We work with founders and marketing
@@ -63,18 +62,20 @@ function About() {
           automation into one delivery team.
         </p>
 
-        <div className="shadow-soft mt-16 aspect-[16/7] overflow-hidden rounded-[2rem] bg-ink">
+        <MaskReveal className="shadow-soft mt-16 aspect-[16/7] rounded-[2rem] bg-ink">
           <div className="bg-brand grid h-full w-full place-items-center px-8 text-center opacity-90">
             <p className="font-display text-2xl font-bold text-ink-foreground sm:text-4xl">
-              A studio of designers, engineers and automation nerds.
+              <Chars text="A studio of designers, engineers and automation nerds." />
             </p>
           </div>
-        </div>
+        </MaskReveal>
 
         <div className="mt-20 grid gap-10 border-y border-border py-12 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((s, i) => (
             <Reveal key={s.k} delay={i * 0.05}>
-              <p className="text-gradient font-display text-5xl font-bold">{s.k}</p>
+              <Parallax distance={18}>
+                <p className="text-gradient font-display text-5xl font-bold">{s.k}</p>
+              </Parallax>
               <p className="mt-2 text-sm text-muted-foreground">{s.v}</p>
             </Reveal>
           ))}
@@ -85,7 +86,8 @@ function About() {
           <div className="grid gap-6 sm:grid-cols-2">
             {values.map((v, i) => (
               <Reveal key={v.t} delay={i * 0.05}>
-                <div className="h-full rounded-3xl border border-border p-7">
+                <div className="group relative h-full overflow-hidden rounded-3xl border border-border p-7 transition-transform duration-500 hover:-translate-y-1.5">
+                  <span className="bg-brand absolute inset-x-0 bottom-0 h-1 -translate-x-full transition-transform duration-500 group-hover:translate-x-0" />
                   <h3 className="text-xl font-semibold">{v.t}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{v.d}</p>
                 </div>
@@ -107,13 +109,17 @@ function About() {
           </div>
         </div>
 
-        <Link
-          to="/contact"
-          className="bg-ink group mt-20 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-ink-foreground"
-        >
-          Work with us
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </Link>
+        <Magnetic className="mt-20 inline-block">
+          <Link
+            to="/contact"
+            data-cursor-label="Go"
+            className="bg-ink group relative inline-flex items-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-ink-foreground"
+          >
+            <span className="bg-brand absolute inset-0 translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
+            <span className="relative">Work with us</span>
+            <ArrowRight className="relative h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </Magnetic>
       </div>
     </main>
   );

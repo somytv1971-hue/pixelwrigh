@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, useScroll, useTransform } from "motion/react";
 import { ArrowRight, Plus } from "lucide-react";
 import { useRef, useState } from "react";
-import { Blobs, Reveal, Words } from "@/components/site/Reveal";
+import { Blobs, Reveal, Words, MaskReveal, Chars } from "@/components/site/Reveal";
+import { Magnetic, Parallax } from "@/components/site/Motion";
 import { EmptyState, PostCard, ProjectCard } from "@/components/site/Cards";
 import { fetchProjects, fetchPublishedPosts } from "@/lib/content";
 import { faqs, processSteps, site, topServices } from "@/lib/site";
@@ -30,8 +31,8 @@ export const Route = createFileRoute("/")({
 function Marquee() {
   const items = ["Websites", "E-commerce", "SaaS", "Automation", "AI assistants", "Branding", "Motion"];
   return (
-    <div className="border-y border-border py-5">
-      <div className="flex w-max animate-marquee gap-10">
+    <div className="group border-y border-border py-5">
+      <div className="flex w-max animate-marquee gap-10 group-hover:[animation-play-state:paused]">
         {[...items, ...items, ...items, ...items].map((item, i) => (
           <span key={`${item}-${i}`} className="font-display text-xl font-semibold text-muted-foreground">
             {item} <span className="text-gradient">✦</span>
@@ -63,9 +64,7 @@ function Hero() {
         <h1 className="display-xl text-[3rem] sm:text-[4.5rem] lg:text-[6rem]">
           <Words text="Digital design &" />
           <br />
-          <span className="text-gradient">
-            <Words text="development agency" />
-          </span>
+          <Words text="development agency" className="text-gradient" />
         </h1>
         <motion.p
           initial={{ opacity: 0, y: 16 }}
@@ -82,33 +81,42 @@ function Hero() {
           transition={{ delay: 0.9, duration: 0.8 }}
           className="mt-10 flex flex-wrap justify-center gap-3"
         >
-          <Link
-            to="/contact"
-            className="bg-ink group flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-ink-foreground"
-          >
-            Start a project
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-          <Link
-            to="/our-work"
-            className="rounded-full border border-border px-7 py-3.5 text-sm font-semibold transition-colors hover:bg-secondary"
-          >
-            See our work
-          </Link>
+          <Magnetic>
+            <Link
+              to="/contact"
+              data-cursor-label="Go"
+              className="bg-ink group relative flex items-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-ink-foreground"
+            >
+              <span className="bg-brand absolute inset-0 translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
+              <span className="relative">Start a project</span>
+              <ArrowRight className="relative h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Magnetic>
+          <Magnetic>
+            <Link
+              to="/our-work"
+              className="group relative flex items-center overflow-hidden rounded-full border border-border px-7 py-3.5 text-sm font-semibold"
+            >
+              <span className="absolute inset-0 translate-y-full bg-secondary transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
+              <span className="relative">See our work</span>
+            </Link>
+          </Magnetic>
         </motion.div>
       </div>
 
       <motion.div
         style={{ scale, y }}
-        className="shadow-soft mx-auto mt-16 aspect-[16/8] w-full max-w-6xl overflow-hidden rounded-[2rem] bg-ink"
+        className="mx-auto mt-16 w-full max-w-6xl"
       >
-        <div className="bg-brand relative h-full w-full opacity-90">
-          <div className="absolute inset-0 grid place-items-center px-8 text-center">
-            <p className="font-display text-2xl font-bold text-ink-foreground sm:text-4xl lg:text-5xl">
-              Design that performs. Code that lasts.
-            </p>
+        <MaskReveal className="shadow-soft aspect-[16/8] w-full rounded-[2rem] bg-ink">
+          <div className="bg-brand relative h-full w-full opacity-90">
+            <div className="absolute inset-0 grid place-items-center px-8 text-center">
+              <p className="font-display text-2xl font-bold text-ink-foreground sm:text-4xl lg:text-5xl">
+                <Chars text="Design that performs. Code that lasts." />
+              </p>
+            </div>
           </div>
-        </div>
+        </MaskReveal>
       </motion.div>
     </section>
   );
@@ -119,7 +127,7 @@ function Faq() {
   return (
     <section className="bg-ink px-5 py-24 text-ink-foreground lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <h2 className="display-xl text-5xl sm:text-7xl">FAQ</h2>
+        <h2 className="display-xl text-5xl sm:text-7xl"><Words text="FAQ" /></h2>
         <div className="mt-14">
           {faqs.map((f, i) => (
             <div key={f.q} className="border-t border-white/15">
@@ -161,7 +169,7 @@ function Index() {
         <div className="mx-auto max-w-7xl">
           <Reveal>
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-              <h2 className="display-xl min-w-0 text-4xl sm:text-6xl">Selected work</h2>
+              <h2 className="display-xl min-w-0 text-4xl sm:text-6xl"><Words text="Selected work" /></h2>
               <Link to="/our-work" className="text-sm font-semibold underline underline-offset-4">
                 All projects
               </Link>
@@ -188,7 +196,7 @@ function Index() {
       <section className="bg-secondary/50 px-5 py-24 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <Reveal>
-            <h2 className="display-xl text-4xl sm:text-6xl">Our solutions</h2>
+            <h2 className="display-xl text-4xl sm:text-6xl"><Words text="Our solutions" /></h2>
           </Reveal>
           <div className="mt-14 grid gap-4 md:grid-cols-2">
             {topServices.map((s, i) => (
@@ -196,8 +204,10 @@ function Index() {
                 <Link
                   to="/services/$slug"
                   params={{ slug: s.slug }}
-                  className="group flex h-full flex-col justify-between rounded-3xl border border-border bg-background p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-soft"
+                  data-cursor-label="Open"
+                  className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-border bg-background p-8 transition-all duration-500 hover:-translate-y-2 hover:shadow-soft"
                 >
+                  <span className="bg-brand absolute inset-x-0 bottom-0 h-1 -translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0" />
                   <div>
                     <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                       0{i + 1}
@@ -219,12 +229,14 @@ function Index() {
       <section className="px-5 py-24 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <Reveal>
-            <h2 className="display-xl text-4xl sm:text-6xl">How we work</h2>
+            <h2 className="display-xl text-4xl sm:text-6xl"><Words text="How we work" /></h2>
           </Reveal>
           <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {processSteps.map((s, i) => (
               <Reveal key={s.n} delay={i * 0.07}>
-                <p className="text-gradient font-display text-5xl font-bold">{s.n}</p>
+                <Parallax distance={24}>
+                  <p className="text-gradient font-display text-5xl font-bold">{s.n}</p>
+                </Parallax>
                 <h3 className="mt-4 text-xl font-semibold">{s.t}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
               </Reveal>
@@ -237,7 +249,7 @@ function Index() {
         <div className="mx-auto max-w-7xl">
           <Reveal>
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-              <h2 className="display-xl min-w-0 text-4xl sm:text-6xl">From the blog</h2>
+              <h2 className="display-xl min-w-0 text-4xl sm:text-6xl"><Words text="From the blog" /></h2>
               <Link to="/blog" className="text-sm font-semibold underline underline-offset-4">
                 All articles
               </Link>
