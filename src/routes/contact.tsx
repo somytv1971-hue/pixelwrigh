@@ -2,9 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ArrowRight, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { Blobs, Words } from "@/components/site/Reveal";
-import { supabase } from "@/integrations/supabase/client";
+import { submitLead } from "@/lib/leads.functions";
 import { budgets, interests, site } from "@/lib/site";
+
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
