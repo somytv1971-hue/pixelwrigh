@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { motion, useScroll, useTransform } from "motion/react";
+import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 import { ArrowRight, Plus } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Blobs, Reveal, Words, MaskReveal, Chars } from "@/components/site/Reveal";
 import { Magnetic, Parallax } from "@/components/site/Motion";
 import { EmptyState, PostCard, ProjectCard } from "@/components/site/Cards";
@@ -53,6 +53,7 @@ const scenes = [
 /** Auto-cycling showreel like the reference video: scenes crossfade with a slow zoom. */
 function HeroReel() {
   const [i, setI] = useState(0);
+  const scene = scenes[i]!;
 
   useEffect(() => {
     const id = setInterval(() => setI((n) => (n + 1) % scenes.length), 3400);
@@ -64,7 +65,7 @@ function HeroReel() {
       <AnimatePresence initial={false}>
         <motion.div
           key={i}
-          className={`absolute inset-0 ${scenes[i].bg}`}
+          className={`absolute inset-0 ${scene.bg}`}
           initial={{ opacity: 0, scale: 1.16, filter: "blur(10px)" }}
           animate={{ opacity: 1, scale: 1.02, filter: "blur(0px)" }}
           exit={{ opacity: 0, scale: 1, filter: "blur(6px)" }}
@@ -78,7 +79,7 @@ function HeroReel() {
                 transition={{ delay: 0.25, duration: 0.6 }}
                 className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-ink-foreground/70"
               >
-                {scenes[i].label}
+                {scene.label}
               </motion.p>
               <span className="mt-4 block overflow-hidden">
                 <motion.span
@@ -87,7 +88,7 @@ function HeroReel() {
                   animate={{ y: "0%", rotate: 0 }}
                   transition={{ delay: 0.15, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  {scenes[i].caption}
+                  {scene.caption}
                 </motion.span>
               </span>
             </div>
