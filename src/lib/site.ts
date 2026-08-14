@@ -196,3 +196,39 @@ export const processSteps = [
   { n: "03", t: "Build", d: "Clean, fast, accessible code with weekly demos." },
   { n: "04", t: "Automate", d: "Wire in AI and workflows so the site keeps working after launch." },
 ];
+
+export const testimonials = [
+  {
+    quote:
+      "Nuvora completed a rebranding of our company website. The quality of the team's work exceeded my expectations, and since completion we have won a number of awards.",
+    client: "Zelt",
+    role: "HR platform",
+  },
+  {
+    quote:
+      "We worked with the Nuvora team over a several month project on a complete website rehaul, that included new copy, design, and code. Several things stood out in our interaction.",
+    client: "LoanPro",
+    role: "Modern credit platform",
+  },
+  {
+    quote:
+      "Nuvora was engaged in developing our website and additional marketing materials, including theming and various creative assignments. Their efforts were highly satisfactory.",
+    client: "Potion",
+    role: "Video personalisation",
+  },
+  {
+    quote:
+      "They moved faster than our in-house team and still shipped the most polished product surface we've ever launched. The handover documentation alone was worth it.",
+    client: "Northwind",
+    role: "Logistics SaaS",
+  },
+];
+
+export const clientStats = [
+  { value: "15+", label: "Years of experience" },
+  { value: "Awarded", label: "Recognized by leading design awards" },
+  { value: "300+", label: "Projects delivered worldwide" },
+];
+
+export const whyCopy =
+  "For over 15 years, we've been helping startups, scale-ups and global companies transform ambitious ideas into successful digital products. Our work has earned international recognition, but what matters most to us is building long-term partnerships and delivering measurable business value.";
