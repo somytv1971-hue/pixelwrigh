@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { ArrowRight, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Blobs, Reveal, Words, MaskReveal, Chars } from "@/components/site/Reveal";
-import { Magnetic, Parallax, Tilt } from "@/components/site/Motion";
+import { Blobs, Reveal, Words, MaskReveal } from "@/components/site/Reveal";
+import { Magnetic, Parallax } from "@/components/site/Motion";
 import { EmptyState, PostCard, ProjectCard } from "@/components/site/Cards";
 import { fetchProjects, fetchPublishedPosts } from "@/lib/content";
 import { clientStats, faqs, processSteps, site, testimonials, topServices, whyCopy } from "@/lib/site";
@@ -190,39 +190,62 @@ function Hero() {
 }
 
 
-/** Trusted by our clients: staggered testimonial cards + credibility stats. */
-function Clients() {
+function ClientCard({
+  testimonial,
+  index,
+  progress,
+}: {
+  testimonial: (typeof testimonials)[number];
+  index: number;
+  progress: MotionValue<number>;
+}) {
+  const reduceMotion = useReducedMotion();
+  const isLowerCard = index > 2;
+  const startX = index === 0 ? "100%" : index === 2 ? "-100%" : "0%";
+  const startY = index === 1 ? "0%" : isLowerCard ? "-72%" : "46%";
+  const startRotate = index === 0 ? -8 : index === 2 ? 8 : isLowerCard ? -4 : 0;
+  const x = useTransform(progress, [0.08, 0.78], [reduceMotion ? "0%" : startX, "0%"]);
+  const y = useTransform(progress, [0.08, 0.78], [reduceMotion ? "0%" : startY, "0%"]);
+  const rotate = useTransform(progress, [0.08, 0.78], [reduceMotion ? 0 : startRotate, 0]);
+  const opacity = useTransform(progress, [0, 0.16], [0, 1]);
+  const scale = useTransform(progress, [0.08, 0.78], [reduceMotion ? 1 : 0.92, 1]);
+
   return (
-    <section className="overflow-hidden px-5 py-24 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <Reveal>
-          <h2 className="display-xl text-center text-4xl sm:text-6xl lg:text-7xl">
+    <motion.figure
+      style={{ x, y, rotate, opacity, scale, zIndex: 10 - index }}
+      className={`relative flex min-h-64 flex-col justify-between border border-border p-7 md:min-h-72 ${
+        index % 2 === 1 ? "bg-accent" : "bg-secondary"
+      } ${isLowerCard ? "md:col-start-2" : ""}`}
+    >
+      <span className="font-display text-4xl leading-none text-foreground/25">”</span>
+      <blockquote className="mt-4 text-sm leading-relaxed text-foreground/80">{testimonial.quote}</blockquote>
+      <figcaption className="mt-8 border-t border-foreground/10 pt-4">
+        <p className="font-display text-xl font-bold">{testimonial.client}</p>
+        <p className="mt-1 text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground">
+          {testimonial.role}
+        </p>
+      </figcaption>
+    </motion.figure>
+  );
+}
+
+/** Scroll-linked fan-to-grid sequence matched to the supplied client animation. */
+function Clients() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
+
+  return (
+    <section ref={ref} className="overflow-hidden px-5 py-24 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <Reveal y={18}>
+          <h2 className="display-xl text-center text-4xl sm:text-5xl lg:text-6xl">
             <Words text="Trusted by our clients" />
           </h2>
         </Reveal>
 
-        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="relative mt-16 grid gap-3 md:grid-cols-3">
           {testimonials.map((t, i) => (
-            <Parallax key={t.client} distance={i % 2 === 1 ? 42 : 14}>
-              <Reveal delay={i * 0.08}>
-                <Tilt>
-                  <figure
-                    className={`flex h-full flex-col justify-between rounded-[1.75rem] border border-border p-7 transition-shadow duration-500 hover:shadow-soft ${
-                      i % 2 === 1 ? "bg-secondary/70" : "bg-background"
-                    } ${i % 2 === 1 ? "md:mt-10" : ""}`}
-                  >
-                    <span className="font-display block text-5xl leading-none text-muted-foreground/50">”</span>
-                    <blockquote className="mt-4 text-sm leading-relaxed text-foreground/80">{t.quote}</blockquote>
-                    <figcaption className="mt-8">
-                      <p className="font-display text-xl font-bold">{t.client}</p>
-                      <p className="mt-1 text-[0.7rem] uppercase tracking-[0.18em] text-muted-foreground">
-                        {t.role}
-                      </p>
-                    </figcaption>
-                  </figure>
-                </Tilt>
-              </Reveal>
-            </Parallax>
+            <ClientCard key={t.client} testimonial={t} index={i} progress={scrollYProgress} />
           ))}
         </div>
 
@@ -236,21 +259,23 @@ function Clients() {
             </Reveal>
           </div>
 
-          <div className="mt-14 grid gap-4 md:grid-cols-3">
+          <div className="mt-14 grid gap-3 md:grid-cols-3">
             {clientStats.map((s, i) => (
-              <Reveal key={s.label} delay={i * 0.07}>
-                <div
-                  className={`h-full rounded-[1.75rem] p-8 ${
-                    i === 1 ? "bg-background border border-border" : "bg-secondary/70"
-                  }`}
-                >
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, y: 90, rotate: i === 0 ? -4 : i === 2 ? 4 : 0 }}
+                whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+                viewport={{ once: false, margin: "-8%" }}
+                transition={{ duration: 0.85, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className={`h-full border border-border p-8 ${i % 2 === 0 ? "bg-accent" : "bg-secondary"}`}>
                   <span className="bg-brand block h-2 w-2 rounded-full" />
                   <p className="font-display mt-10 text-4xl font-bold sm:text-5xl">{s.value}</p>
                   <p className="mt-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                     {s.label}
                   </p>
                 </div>
-              </Reveal>
+              </motion.div>
             ))}
           </div>
         </div>
