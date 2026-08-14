@@ -53,7 +53,6 @@ function BlogPost() {
         <h1 className="display-xl mt-4 text-4xl sm:text-5xl">{post.title}</h1>
         <p className="mt-5 text-sm text-muted-foreground">
           {formatDate(post.published_at ?? post.created_at)} · {post.read_minutes} min read
-          {post.author_name ? ` · ${post.author_name}` : ""}
         </p>
         {post.excerpt ? <p className="mt-6 text-lg text-muted-foreground">{post.excerpt}</p> : null}
 

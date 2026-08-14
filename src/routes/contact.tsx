@@ -69,7 +69,7 @@ function Contact() {
       email: email.trim(),
       interests: selected,
       budget: budget || null,
-      details: details.trim(),
+      message: details.trim(),
     });
     setSending(false);
     if (error) {
