@@ -4,10 +4,10 @@ import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 import { ArrowRight, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Blobs, Reveal, Words, MaskReveal, Chars } from "@/components/site/Reveal";
-import { Magnetic, Parallax } from "@/components/site/Motion";
+import { Magnetic, Parallax, Tilt } from "@/components/site/Motion";
 import { EmptyState, PostCard, ProjectCard } from "@/components/site/Cards";
 import { fetchProjects, fetchPublishedPosts } from "@/lib/content";
-import { faqs, processSteps, site, topServices } from "@/lib/site";
+import { clientStats, faqs, processSteps, site, testimonials, topServices, whyCopy } from "@/lib/site";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -203,7 +203,7 @@ function Clients() {
 
         <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {testimonials.map((t, i) => (
-            <Parallax key={t.client} amount={i % 2 === 1 ? 42 : 14}>
+            <Parallax key={t.client} distance={i % 2 === 1 ? 42 : 14}>
               <Reveal delay={i * 0.08}>
                 <Tilt>
                   <figure
