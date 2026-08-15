@@ -14,6 +14,7 @@ const serverEnv = loadEnv(process.env["NODE_ENV"] ?? "development", process.cwd(
 Object.assign(process.env, serverEnv);
 
 export default defineConfig({
+  plugins: [],
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
@@ -24,7 +25,6 @@ export default defineConfig({
     preset: "cloudflare-pages",
   },
   vite: {
-    plugins: [],
     build: {
       chunkSizeWarningLimit: 1000,
     },
