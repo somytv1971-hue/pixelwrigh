@@ -20,9 +20,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  // Target Cloudflare Pages for deployment
+  // Auto-detect deployment preset (Vercel vs Cloudflare Pages)
   nitro: {
-    preset: "cloudflare-pages",
+    preset: process.env.VERCEL ? "vercel" : (process.env.NITRO_PRESET || "cloudflare-pages"),
   },
   vite: {
     build: {

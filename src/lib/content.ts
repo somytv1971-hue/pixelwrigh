@@ -22,34 +22,58 @@ export const formatDate = (value: string | null) =>
     : "";
 
 export async function fetchPublishedPosts(limit?: number) {
-  let query = supabase
-    .from("posts")
-    .select("*")
-    .eq("status", "published")
-    .order("published_at", { ascending: false, nullsFirst: false });
-  if (limit) query = query.limit(limit);
-  const { data, error } = await query;
-  if (error) throw error;
-  return data ?? [];
+  try {
+    let query = supabase
+      .from("posts")
+      .select("*")
+      .eq("status", "published")
+      .order("published_at", { ascending: false, nullsFirst: false });
+    if (limit) query = query.limit(limit);
+    const { data, error } = await query;
+    if (error) {
+      console.warn("[content] fetchPublishedPosts error:", error.message);
+      return [];
+    }
+    return data ?? [];
+  } catch (err) {
+    console.warn("[content] fetchPublishedPosts caught error:", err);
+    return [];
+  }
 }
 
 export async function fetchPostBySlug(slug: string) {
-  const { data, error } = await supabase.from("posts").select("*").eq("slug", slug).maybeSingle();
-  if (error) throw error;
-  return data;
+  try {
+    const { data, error } = await supabase.from("posts").select("*").eq("slug", slug).maybeSingle();
+    if (error) {
+      console.warn("[content] fetchPostBySlug error:", error.message);
+      return null;
+    }
+    return data;
+  } catch (err) {
+    console.warn("[content] fetchPostBySlug caught error:", err);
+    return null;
+  }
 }
 
 export async function fetchProjects(serviceSlug?: string) {
-  let query = supabase
-    .from("projects")
-    .select("*")
-    .eq("status", "published")
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: false });
-  if (serviceSlug) query = query.eq("service_slug", serviceSlug);
-  const { data, error } = await query;
-  if (error) throw error;
-  return data ?? [];
+  try {
+    let query = supabase
+      .from("projects")
+      .select("*")
+      .eq("status", "published")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+    if (serviceSlug) query = query.eq("service_slug", serviceSlug);
+    const { data, error } = await query;
+    if (error) {
+      console.warn("[content] fetchProjects error:", error.message);
+      return [];
+    }
+    return data ?? [];
+  } catch (err) {
+    console.warn("[content] fetchProjects caught error:", err);
+    return [];
+  }
 }
 
 export async function uploadMedia(file: File) {
