@@ -19,11 +19,12 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  // Target Vercel serverless functions instead of the default Cloudflare Workers preset
+  // Target Cloudflare Pages for deployment
   nitro: {
-    preset: "vercel",
+    preset: "cloudflare-pages",
   },
   vite: {
+    plugins: [],
     build: {
       chunkSizeWarningLimit: 1000,
     },
