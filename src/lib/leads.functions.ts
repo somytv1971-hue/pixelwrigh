@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 
 export const submitLead = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => {
+  .validator((data: unknown) => {
     const raw = (data ?? {}) as Record<string, unknown>
     const name = String(raw['name'] ?? '').trim().slice(0, 120)
     const email = String(raw['email'] ?? '').trim().slice(0, 200)

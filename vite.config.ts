@@ -24,6 +24,19 @@ export default defineConfig({
     preset: "vercel",
   },
   vite: {
+    build: {
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("recharts")) return "vendor-recharts";
+            if (id.includes("@radix-ui")) return "vendor-radix";
+            if (id.includes("@react-email") || id.includes("react-email"))
+              return "vendor-react-email";
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         "entities/lib/decode.js": path.resolve(process.cwd(), "node_modules/entities/lib/decode.js"),
