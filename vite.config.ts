@@ -19,6 +19,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Target Vercel serverless functions instead of the default Cloudflare Workers preset
+  nitro: {
+    preset: "vercel",
+  },
   vite: {
     resolve: {
       alias: {
