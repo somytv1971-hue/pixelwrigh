@@ -9,7 +9,7 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 // Configuration
-const SITE_NAME = "Aura Studio"
+const SITE_NAME = "Pixelwright"
 const SENDER_DOMAIN = "notify.digitalgoodsmart.xyz"
 const ROOT_DOMAIN = "digitalgoodsmart.xyz"
 const FROM_DOMAIN = "notify.digitalgoodsmart.xyz"

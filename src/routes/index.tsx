@@ -12,13 +12,13 @@ import { clientStats, faqs, processSteps, site, testimonials, topServices, whyCo
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Nuvora — Digital design & development agency" },
+      { title: `${site.name} — ${site.tagline}` },
       {
         name: "description",
         content:
           "We design and build websites, e-commerce stores, SaaS products and AI automation for companies ready to move beyond the ordinary.",
       },
-      { property: "og:title", content: "Nuvora — Digital design & development agency" },
+      { property: "og:title", content: `${site.name} — ${site.tagline}` },
       {
         property: "og:description",
         content: "Websites, e-commerce, SaaS and automation built by a small senior team.",

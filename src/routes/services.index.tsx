@@ -1,18 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { Blobs, Reveal, Words } from "@/components/site/Reveal";
-import { automationChildren, topServices } from "@/lib/site";
+import { automationChildren, site, topServices } from "@/lib/site";
 
 export const Route = createFileRoute("/services/")({
   head: () => ({
     meta: [
-      { title: "Services — Nuvora" },
+      { title: `Services — ${site.name}` },
       {
         name: "description",
         content:
           "Website build, e-commerce, SaaS development and automation including Facebook, WhatsApp, YouTube and AI assistants.",
       },
-      { property: "og:title", content: "Services — Nuvora" },
+      { property: "og:title", content: `Services — ${site.name}` },
       { property: "og:description", content: "Websites, commerce, SaaS and automation services." },
     ],
   }),

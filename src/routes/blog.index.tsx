@@ -4,16 +4,17 @@ import { useMemo, useState } from "react";
 import { Blobs, Reveal, Words } from "@/components/site/Reveal";
 import { EmptyState, PostCard } from "@/components/site/Cards";
 import { fetchPublishedPosts } from "@/lib/content";
+import { site } from "@/lib/site";
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
-      { title: "Blog — Nuvora" },
+      { title: `Blog — ${site.name}` },
       {
         name: "description",
-        content: "Design cases, development notes and automation playbooks from the Nuvora studio.",
+        content: `Design cases, development notes and automation playbooks from the ${site.name} studio.`,
       },
-      { property: "og:title", content: "Blog — Nuvora" },
+      { property: "og:title", content: `Blog — ${site.name}` },
       { property: "og:description", content: "Design cases, dev notes and automation playbooks." },
     ],
   }),

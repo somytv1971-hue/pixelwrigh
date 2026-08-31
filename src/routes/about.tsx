@@ -7,13 +7,13 @@ import { processSteps, site } from "@/lib/site";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — Nuvora" },
+      { title: `About — ${site.name}` },
       {
         name: "description",
         content:
-          "Nuvora is a small senior studio in Dhaka designing and building websites, SaaS products and automation systems.",
+          `${site.name} is a small senior studio in Dhaka designing and building websites, SaaS products and automation systems.`,
       },
-      { property: "og:title", content: "About — Nuvora" },
+      { property: "og:title", content: `About — ${site.name}` },
       { property: "og:description", content: "A small senior studio obsessed with craft and outcomes." },
     ],
   }),

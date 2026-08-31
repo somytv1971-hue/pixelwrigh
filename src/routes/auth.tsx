@@ -6,15 +6,16 @@ import { Logo } from "@/components/site/Logo";
 import { Blobs } from "@/components/site/Reveal";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { site } from "@/lib/site";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Nuvora studio" },
-      { name: "description", content: "Sign in to the Nuvora content studio to manage posts and projects." },
+      { title: `Sign in — ${site.name} studio` },
+      { name: "description", content: `Sign in to the ${site.name} content studio to manage posts and projects.` },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Sign in — Nuvora studio" },
-      { property: "og:description", content: "Studio access for the Nuvora team." },
+      { property: "og:title", content: `Sign in — ${site.name} studio` },
+      { property: "og:description", content: `Studio access for the ${site.name} team.` },
     ],
   }),
   component: AuthPage,

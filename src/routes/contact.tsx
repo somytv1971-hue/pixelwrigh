@@ -11,12 +11,12 @@ import { budgets, interests, site } from "@/lib/site";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — Nuvora" },
+      { title: `Contact — ${site.name}` },
       {
         name: "description",
         content: "Tell us about your project — websites, e-commerce, SaaS or automation. We reply within a day.",
       },
-      { property: "og:title", content: "Contact — Nuvora" },
+      { property: "og:title", content: `Contact — ${site.name}` },
       { property: "og:description", content: "Hey! Tell us all the things about your project." },
     ],
   }),

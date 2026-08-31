@@ -4,7 +4,7 @@ import { ArrowRight, Check } from "lucide-react";
 import { Blobs, Reveal, Words } from "@/components/site/Reveal";
 import { EmptyState, ProjectCard } from "@/components/site/Cards";
 import { fetchProjects } from "@/lib/content";
-import { automationChildren, serviceBySlug } from "@/lib/site";
+import { automationChildren, serviceBySlug, site } from "@/lib/site";
 
 export const Route = createFileRoute("/services/$slug")({
   loader: ({ params }) => {
@@ -14,14 +14,14 @@ export const Route = createFileRoute("/services/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Service not found — Nuvora" }, { name: "robots", content: "noindex" }] };
+      return { meta: [{ title: `Service not found — ${site.name}` }, { name: "robots", content: "noindex" }] };
     }
     const { service } = loaderData;
     return {
       meta: [
-        { title: `${service.name} — Nuvora` },
+        { title: `${service.name} — ${site.name}` },
         { name: "description", content: service.intro.slice(0, 155) },
-        { property: "og:title", content: `${service.name} — Nuvora` },
+        { property: "og:title", content: `${service.name} — ${site.name}` },
         { property: "og:description", content: service.short },
       ],
     };

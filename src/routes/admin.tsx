@@ -4,14 +4,15 @@ import { FileText, FolderKanban, Inbox, LayoutDashboard, LogOut } from "lucide-r
 import { Logo } from "@/components/site/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { site } from "@/lib/site";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Studio — Nuvora admin" },
-      { name: "description", content: "Manage Nuvora blog posts, projects and leads." },
+      { title: `Studio — ${site.name} admin` },
+      { name: "description", content: `Manage ${site.name} blog posts, projects and leads.` },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Studio — Nuvora admin" },
+      { property: "og:title", content: `Studio — ${site.name} admin` },
       { property: "og:description", content: "Internal content studio." },
     ],
   }),

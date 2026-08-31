@@ -4,17 +4,17 @@ import { useState } from "react";
 import { Blobs, Reveal, Words } from "@/components/site/Reveal";
 import { EmptyState, ProjectCard } from "@/components/site/Cards";
 import { fetchProjects } from "@/lib/content";
-import { services } from "@/lib/site";
+import { services, site } from "@/lib/site";
 
 export const Route = createFileRoute("/our-work")({
   head: () => ({
     meta: [
-      { title: "Our work — Nuvora" },
+      { title: `Our work — ${site.name}` },
       {
         name: "description",
-        content: "Selected websites, e-commerce stores, SaaS products and automation systems built by Nuvora.",
+        content: `Selected websites, e-commerce stores, SaaS products and automation systems built by ${site.name}.`,
       },
-      { property: "og:title", content: "Our work — Nuvora" },
+      { property: "og:title", content: `Our work — ${site.name}` },
       { property: "og:description", content: "A selection of projects across web, commerce, SaaS and AI." },
     ],
   }),

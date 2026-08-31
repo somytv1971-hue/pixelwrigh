@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="50%" stop-color="#c026d3"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#181126"/>
+      <stop offset="100%" stop-color="#090611"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer rounded background -->
+  <rect width="64" height="64" rx="16" fill="url(#bgGrad)"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="15.25" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+
+  <!-- Inner brand badge -->
+  <rect x="10" y="10" width="44" height="44" rx="12" fill="url(#brandGrad)"/>
+
+  <!-- Lowercase 'p' for pixelwright -->
+  <text x="32" y="38" font-family="'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="32" font-weight="700" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">p</text>
+  
+  <!-- Sparkle dot accent -->
+  <circle cx="45" cy="17" r="3.5" fill="#38bdf8"/>
+</svg>

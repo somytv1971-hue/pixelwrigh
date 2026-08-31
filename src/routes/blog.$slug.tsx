@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Markdown } from "@/components/site/Markdown";
 import { PostCard } from "@/components/site/Cards";
 import { fetchPostBySlug, fetchPublishedPosts, formatDate } from "@/lib/content";
+import { site } from "@/lib/site";
 
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
@@ -13,11 +14,11 @@ export const Route = createFileRoute("/blog/$slug")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Article unavailable — Nuvora" }, { name: "robots", content: "noindex" }] };
+      return { meta: [{ title: `Article unavailable — ${site.name}` }, { name: "robots", content: "noindex" }] };
     }
     const { post } = loaderData;
     const meta = [
-      { title: `${post.title} — Nuvora` },
+      { title: `${post.title} — ${site.name}` },
       { name: "description", content: (post.excerpt ?? post.title).slice(0, 155) },
       { property: "og:title", content: post.title },
       { property: "og:description", content: (post.excerpt ?? post.title).slice(0, 155) },
