@@ -99,10 +99,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
-      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/favicon.png" },
-      { rel: "alternate icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/pixelwright.png", type: "image/png" },
+      { rel: "icon", href: "/pixelwright.svg", type: "image/svg+xml" },
+      { rel: "shortcut icon", href: "/pixelwright.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/pixelwright.png" },
+      { rel: "alternate icon", href: "/pixelwright.ico", type: "image/x-icon" },
+      { rel: "manifest", href: "/site.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -121,6 +123,11 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <title>Pixelwright — Digital design &amp; development agency</title>
+        <link rel="icon" type="image/png" href="/pixelwright.png" />
+        <link rel="icon" type="image/svg+xml" href="/pixelwright.svg" />
+        <link rel="shortcut icon" type="image/png" href="/pixelwright.png" />
+        <link rel="apple-touch-icon" href="/pixelwright.png" />
         <HeadContent />
       </head>
       <body>
@@ -135,6 +142,32 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const bare = pathname.startsWith("/admin") || pathname.startsWith("/auth");
+
+  useEffect(() => {
+    // Ensure active favicon is set to pixelwright icon in browser DOM
+    try {
+      const existingIcons = document.querySelectorAll("link[rel*='icon']");
+      existingIcons.forEach((el) => el.remove());
+
+      const pngIcon = document.createElement("link");
+      pngIcon.rel = "icon";
+      pngIcon.type = "image/png";
+      pngIcon.href = "/pixelwright.png";
+      document.head.appendChild(pngIcon);
+
+      const shortcutIcon = document.createElement("link");
+      shortcutIcon.rel = "shortcut icon";
+      shortcutIcon.href = "/pixelwright.png";
+      document.head.appendChild(shortcutIcon);
+
+      const appleIcon = document.createElement("link");
+      appleIcon.rel = "apple-touch-icon";
+      appleIcon.href = "/pixelwright.png";
+      document.head.appendChild(appleIcon);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

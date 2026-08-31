@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as OurWorkRouteImport } from './routes/our-work'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -62,6 +63,11 @@ const OurWorkRoute = OurWorkRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLeadsRoute = AdminLeadsRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/our-work': typeof OurWorkRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/our-work': typeof OurWorkRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/our-work': typeof OurWorkRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/leads': typeof AdminLeadsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/our-work'
+    | '/admin/analytics'
     | '/admin/leads'
     | '/blog/$slug'
     | '/services/$slug'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/our-work'
+    | '/admin/analytics'
     | '/admin/leads'
     | '/blog/$slug'
     | '/services/$slug'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/contact'
     | '/our-work'
+    | '/admin/analytics'
     | '/admin/leads'
     | '/blog/$slug'
     | '/services/$slug'
@@ -319,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/leads': {
@@ -409,6 +428,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminLeadsRoute: typeof AdminLeadsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminPostsIdRoute: typeof AdminPostsIdRoute
@@ -418,6 +438,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminLeadsRoute: AdminLeadsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminPostsIdRoute: AdminPostsIdRoute,

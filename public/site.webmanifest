@@ -1,0 +1,25 @@
+{
+  "name": "Pixelwright",
+  "short_name": "Pixelwright",
+  "description": "Pixelwright — Digital design & development agency",
+  "icons": [
+    {
+      "src": "/pixelwright.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pixelwright.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/pixelwright.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#061324",
+  "background_color": "#061324",
+  "display": "standalone"
+}
