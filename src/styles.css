@@ -211,15 +211,46 @@
 }
 
 @utility prose-agency {
+  & h1 {
+    font-size: 2.25rem;
+    margin: 2.5rem 0 1rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--foreground);
+  }
   & h2 {
     font-size: 1.75rem;
     margin: 2rem 0 0.75rem;
     font-weight: 700;
+    line-height: 1.3;
+    color: var(--foreground);
   }
   & h3 {
     font-size: 1.35rem;
     margin: 1.5rem 0 0.5rem;
     font-weight: 700;
+    line-height: 1.4;
+    color: var(--foreground);
+  }
+  & h4 {
+    font-size: 1.15rem;
+    margin: 1.25rem 0 0.5rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  & h5 {
+    font-size: 1rem;
+    margin: 1rem 0 0.4rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  & h6 {
+    font-size: 0.875rem;
+    margin: 0.85rem 0 0.35rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-foreground);
   }
   & p {
     margin: 0 0 1.1rem;
