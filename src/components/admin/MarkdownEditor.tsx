@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
   Bold,
   ChevronDown,
   Code,
   Eye,
-  EyeOff,
   Heading,
   ImageIcon,
   Italic,
@@ -15,14 +17,86 @@ import {
   Loader2,
   Minus,
   Quote,
+  Redo,
   Strikethrough,
   Table,
+  Underline,
+  Undo,
+  Unlink,
   Upload,
   Video,
   X,
 } from "lucide-react";
 import { Markdown } from "@/components/site/Markdown";
 import { readingTime, uploadMedia } from "@/lib/content";
+
+/**
+ * Converts initial Markdown content to HTML so older posts can be rendered visually
+ */
+function markdownToHtml(md: string): string {
+  if (!md) return "<p><br></p>";
+  if (/<(p|h1|h2|h3|h4|h5|h6|div|video|iframe|blockquote|ul|ol|table|strong|em|img|hr)\b[^>]*>/i.test(md)) {
+    return md;
+  }
+
+  let html = md
+    // Headings
+    .replace(/^######\s+(.*)$/gim, "<h6>$1</h6>")
+    .replace(/^#####\s+(.*)$/gim, "<h5>$1</h5>")
+    .replace(/^####\s+(.*)$/gim, "<h4>$1</h4>")
+    .replace(/^###\s+(.*)$/gim, "<h3>$1</h3>")
+    .replace(/^##\s+(.*)$/gim, "<h2>$1</h2>")
+    .replace(/^#\s+(.*)$/gim, "<h1>$1</h1>")
+    // Bold, Italic, Strike
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/__(.*?)__/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/_(.*?)_/g, "<em>$1</em>")
+    .replace(/~~(.*?)~~/g, "<del>$1</del>")
+    // Inline code
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    // Images & Videos
+    .replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
+      if (
+        url.includes("youtube.com") ||
+        url.includes("youtu.be") ||
+        url.includes("vimeo.com")
+      ) {
+        let embed = url;
+        if (url.includes("youtu.be")) {
+          const id = url.split("youtu.be/")[1]?.split("?")[0];
+          embed = `https://www.youtube.com/embed/${id}`;
+        } else if (url.includes("youtube.com/watch")) {
+          const id = new URL(url).searchParams.get("v");
+          embed = `https://www.youtube.com/embed/${id}`;
+        }
+        return `<div class="my-6 aspect-video w-full overflow-hidden rounded-2xl border border-border bg-ink shadow-soft"><iframe src="${embed}" class="h-full w-full border-0" allowfullscreen></iframe></div>`;
+      }
+      if (url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".mov")) {
+        return `<video controls playsinline src="${url}" class="my-6 max-h-[540px] w-full rounded-2xl shadow-soft"></video>`;
+      }
+      return `<img src="${url}" alt="${alt || ""}" class="my-6 max-h-[500px] w-full rounded-2xl object-cover shadow-soft" />`;
+    })
+    // Links
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    // Quotes
+    .replace(/^\>\s+(.*)$/gim, "<blockquote>$1</blockquote>")
+    // Dividers
+    .replace(/^---$/gim, "<hr>")
+    // Paragraphs
+    .split(/\n{2,}/)
+    .map((block) => {
+      const trimmed = block.trim();
+      if (!trimmed) return "";
+      if (/^<(h1|h2|h3|h4|h5|h6|blockquote|ul|ol|hr|div|video|img)/i.test(trimmed)) {
+        return trimmed;
+      }
+      return `<p>${trimmed.replace(/\n/g, "<br>")}</p>`;
+    })
+    .join("");
+
+  return html || "<p><br></p>";
+}
 
 export function MarkdownEditor({
   value,
@@ -31,11 +105,11 @@ export function MarkdownEditor({
   value: string;
   onChange: (next: string) => void;
 }) {
-  const ref = useRef<HTMLTextAreaElement>(null);
-  const imageFileRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const videoFileRef = useRef<HTMLInputElement>(null);
+  const imageFileRef = useRef<HTMLInputElement>(null);
 
-  const [preview, setPreview] = useState(false);
+  const [mode, setMode] = useState<"visual" | "code" | "preview">("visual");
   const [headingOpen, setHeadingOpen] = useState(false);
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
@@ -56,168 +130,118 @@ export function MarkdownEditor({
   // Link modal state
   const [linkText, setLinkText] = useState("");
   const [linkHref, setLinkHref] = useState("https://");
+  const [savedRange, setSavedRange] = useState<Range | null>(null);
 
-  // Selection cache so modals remember what was highlighted
-  const [savedSelection, setSavedSelection] = useState<{ start: number; end: number }>({
-    start: 0,
-    end: 0,
-  });
-
-  const saveSelection = () => {
-    const el = ref.current;
-    if (el) {
-      setSavedSelection({ start: el.selectionStart, end: el.selectionEnd });
+  // Save current selection range before opening modal
+  const saveCurrentRange = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      setSavedRange(sel.getRangeAt(0));
     }
   };
 
-  // Close dropdowns on outside click
+  // Restore saved selection range
+  const restoreRange = () => {
+    if (savedRange) {
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(savedRange);
+      }
+    }
+  };
+
+  // Initialize and sync editor DOM
   useEffect(() => {
-    const handleClickOutside = () => {
-      setHeadingOpen(false);
-    };
+    if (!editorRef.current) return;
+    const currentHtml = editorRef.current.innerHTML;
+    const formattedHtml = markdownToHtml(value);
+    if (currentHtml !== formattedHtml && !editorRef.current.contains(document.activeElement)) {
+      editorRef.current.innerHTML = formattedHtml;
+    }
+  }, [value, mode]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = () => setHeadingOpen(false);
     window.addEventListener("click", handleClickOutside);
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  /**
-   * Applies inline wrapping (e.g. **bold**, _italic_, `code`, ~~strikethrough~~)
-   */
-  const applyInline = (before: string, after: string = before, placeholder = "text") => {
-    const el = ref.current;
-    if (!el) return;
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
-    const selected = value.slice(start, end);
-    const content = selected || placeholder;
-    const replacement = `${before}${content}${after}`;
-    const next = `${value.slice(0, start)}${replacement}${value.slice(end)}`;
-    onChange(next);
-
-    requestAnimationFrame(() => {
-      el.focus();
-      if (!selected) {
-        // Highlight placeholder so user can immediately type
-        el.setSelectionRange(start + before.length, start + before.length + placeholder.length);
-      } else {
-        const caret = start + replacement.length;
-        el.setSelectionRange(caret, caret);
-      }
-    });
+  const handleEditorInput = () => {
+    if (!editorRef.current) return;
+    const html = editorRef.current.innerHTML;
+    onChange(html);
   };
 
   /**
-   * Applies heading level H1-H6 or reverts to plain paragraph
+   * Execute standard browser rich text commands
+   */
+  const exec = (command: string, arg?: string) => {
+    editorRef.current?.focus();
+    document.execCommand(command, false, arg);
+    handleEditorInput();
+  };
+
+  /**
+   * Apply Heading Level (H1 - H6 or Paragraph)
    */
   const applyHeading = (level: number) => {
-    const el = ref.current;
-    if (!el) return;
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
-
-    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
-    let lineEnd = value.indexOf("\n", end);
-    if (lineEnd === -1) lineEnd = value.length;
-
-    const currentLine = value.slice(lineStart, lineEnd);
-    const cleanLine = currentLine.replace(/^#{1,6}\s+/, "");
-    const prefix = level > 0 ? `${"#".repeat(level)} ` : "";
-    const newLine = `${prefix}${cleanLine}`;
-
-    const next = `${value.slice(0, lineStart)}${newLine}${value.slice(lineEnd)}`;
-    onChange(next);
-
     setHeadingOpen(false);
-    requestAnimationFrame(() => {
-      el.focus();
-      const offset = newLine.length - currentLine.length;
-      el.setSelectionRange(start + offset, end + offset);
-    });
+    editorRef.current?.focus();
+    const tag = level === 0 ? "p" : `h${level}`;
+    document.execCommand("formatBlock", false, `<${tag}>`);
+    handleEditorInput();
   };
 
   /**
-   * Applies block prefixes (e.g. quote, bullet list, numbered list)
+   * Apply inline code block to selection
    */
-  const applyBlockPrefix = (prefix: string, defaultText = "Item") => {
-    const el = ref.current;
-    if (!el) return;
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
-    const selected = value.slice(start, end);
-
-    if (selected) {
-      const lines = selected.split("\n");
-      const prefixed = lines
-        .map((l, i) => {
-          if (prefix === "1. ") return `${i + 1}. ${l.replace(/^(\d+\.|\-|\>)\s+/, "")}`;
-          return `${prefix}${l.replace(/^(\d+\.|\-|\>)\s+/, "")}`;
-        })
-        .join("\n");
-      const next = `${value.slice(0, start)}${prefixed}${value.slice(end)}`;
-      onChange(next);
-    } else {
-      const lineStart = value.lastIndexOf("\n", start - 1) + 1;
-      const isStart = start === lineStart;
-      const insertion = isStart ? `${prefix}${defaultText}\n` : `\n${prefix}${defaultText}\n`;
-      const next = `${value.slice(0, start)}${insertion}${value.slice(end)}`;
-      onChange(next);
-    }
-
-    requestAnimationFrame(() => {
-      el.focus();
-    });
+  const applyInlineCode = () => {
+    editorRef.current?.focus();
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const text = sel.toString() || "code";
+    document.execCommand("insertHTML", false, `<code>${text}</code>`);
+    handleEditorInput();
   };
 
   /**
-   * Inserts text block (Divider, Codeblock, Table)
+   * Open Link Modal
    */
-  const insertSnippet = (snippet: string) => {
-    const el = ref.current;
-    if (!el) return;
-    const start = el.selectionStart;
-    const end = el.selectionEnd;
-    const next = `${value.slice(0, start)}${snippet}${value.slice(end)}`;
-    onChange(next);
-    requestAnimationFrame(() => {
-      el.focus();
-      const caret = start + snippet.length;
-      el.setSelectionRange(caret, caret);
-    });
-  };
-
-  /**
-   * Handles Link insertion
-   */
-  const openLinkModal = () => {
-    saveSelection();
-    const el = ref.current;
-    if (el) {
-      const selected = value.slice(el.selectionStart, el.selectionEnd);
-      setLinkText(selected || "link text");
-    }
+  const openLink = () => {
+    saveCurrentRange();
+    const sel = window.getSelection();
+    const selected = sel ? sel.toString() : "";
+    setLinkText(selected || "link text");
     setLinkModalOpen(true);
   };
 
   const confirmLink = () => {
-    const start = savedSelection.start;
-    const end = savedSelection.end;
+    restoreRange();
+    editorRef.current?.focus();
     const text = linkText.trim() || "link";
     const href = linkHref.trim() || "https://";
-    const markdown = `[${text}](${href})`;
-    const next = `${value.slice(0, start)}${markdown}${value.slice(end)}`;
-    onChange(next);
+    document.execCommand(
+      "insertHTML",
+      false,
+      `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`
+    );
+    handleEditorInput();
     setLinkModalOpen(false);
     setLinkHref("https://");
     setLinkText("");
-    requestAnimationFrame(() => {
-      ref.current?.focus();
-    });
+  };
+
+  const removeLink = () => {
+    exec("unlink");
   };
 
   /**
-   * Handles Video URL and Media File upload
+   * Insert Video (URL or File)
    */
-  const openVideoModal = () => {
-    saveSelection();
+  const openVideo = () => {
+    saveCurrentRange();
     setVideoModalOpen(true);
   };
 
@@ -226,28 +250,50 @@ export function MarkdownEditor({
       toast.error("Please enter a video URL");
       return;
     }
-    const start = savedSelection.start;
-    const end = savedSelection.end;
-    const caption = videoTitle.trim() || "video";
-    const markdown = `\n\n![${caption}](${videoUrl.trim()})\n\n`;
-    const next = `${value.slice(0, start)}${markdown}${value.slice(end)}`;
-    onChange(next);
+    restoreRange();
+    editorRef.current?.focus();
+    const url = videoUrl.trim();
+    let embedHtml = "";
+
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      let yt = url;
+      if (url.includes("youtu.be")) {
+        const id = url.split("youtu.be/")[1]?.split("?")[0];
+        yt = `https://www.youtube.com/embed/${id}`;
+      } else if (url.includes("youtube.com/watch")) {
+        try {
+          const id = new URL(url).searchParams.get("v");
+          yt = `https://www.youtube.com/embed/${id}`;
+        } catch {
+          yt = url;
+        }
+      }
+      embedHtml = `<div class="my-6 aspect-video w-full overflow-hidden rounded-2xl border border-border bg-ink shadow-soft"><iframe src="${yt}" class="h-full w-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><p><br></p>`;
+    } else if (url.includes("vimeo.com")) {
+      const match = url.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|video\/|)(\d+)(?:$|\/|\?)/);
+      const vimeo = match?.[3] ? `https://player.vimeo.com/video/${match[3]}` : url;
+      embedHtml = `<div class="my-6 aspect-video w-full overflow-hidden rounded-2xl border border-border bg-ink shadow-soft"><iframe src="${vimeo}" class="h-full w-full border-0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div><p><br></p>`;
+    } else {
+      embedHtml = `<div class="my-6 w-full overflow-hidden rounded-2xl border border-border bg-black shadow-soft"><video controls playsinline src="${url}" class="max-h-[540px] w-full rounded-2xl"></video></div><p><br></p>`;
+    }
+
+    document.execCommand("insertHTML", false, embedHtml);
+    handleEditorInput();
     setVideoModalOpen(false);
     setVideoUrl("");
     setVideoTitle("");
-    toast.success("Video embedded");
+    toast.success("Video inserted");
   };
 
   const handleVideoUpload = async (file: File) => {
     setUploadingVideo(true);
     try {
       const url = await uploadMedia(file);
-      const start = savedSelection.start;
-      const end = savedSelection.end;
-      const caption = file.name.replace(/\.[^.]+$/, "");
-      const markdown = `\n\n![${caption}](${url})\n\n`;
-      const next = `${value.slice(0, start)}${markdown}${value.slice(end)}`;
-      onChange(next);
+      restoreRange();
+      editorRef.current?.focus();
+      const embedHtml = `<div class="my-6 w-full overflow-hidden rounded-2xl border border-border bg-black shadow-soft"><video controls playsinline src="${url}" class="max-h-[540px] w-full rounded-2xl"></video></div><p><br></p>`;
+      document.execCommand("insertHTML", false, embedHtml);
+      handleEditorInput();
       setVideoModalOpen(false);
       toast.success("Video uploaded and inserted!");
     } catch (err: any) {
@@ -258,10 +304,10 @@ export function MarkdownEditor({
   };
 
   /**
-   * Handles Image URL and Media File upload
+   * Insert Image (URL or File)
    */
-  const openImageModal = () => {
-    saveSelection();
+  const openImage = () => {
+    saveCurrentRange();
     setImageModalOpen(true);
   };
 
@@ -270,13 +316,14 @@ export function MarkdownEditor({
       toast.error("Please enter an image URL");
       return;
     }
-    const start = savedSelection.start;
-    const end = savedSelection.end;
-    const alt = imageAlt.trim() || "image";
-    const markdown = `\n\n![${alt}](${imageUrl.trim()})\n\n`;
-    const next = `${value.slice(0, start)}${markdown}${value.slice(end)}`;
-    onChange(next);
+    restoreRange();
+    editorRef.current?.focus();
+    const alt = imageAlt.trim() || "";
+    const html = `<img src="${imageUrl.trim()}" alt="${alt}" class="my-6 max-h-[500px] w-full rounded-2xl object-cover shadow-soft" /><p><br></p>`;
+    document.execCommand("insertHTML", false, html);
+    handleEditorInput();
     setImageModalOpen(false);
+    setImageUrl("");
     setImageAlt("");
     toast.success("Image inserted");
   };
@@ -285,12 +332,12 @@ export function MarkdownEditor({
     setUploadingImage(true);
     try {
       const url = await uploadMedia(file);
-      const start = savedSelection.start;
-      const end = savedSelection.end;
+      restoreRange();
+      editorRef.current?.focus();
       const alt = file.name.replace(/\.[^.]+$/, "");
-      const markdown = `\n\n![${alt}](${url})\n\n`;
-      const next = `${value.slice(0, start)}${markdown}${value.slice(end)}`;
-      onChange(next);
+      const html = `<img src="${url}" alt="${alt}" class="my-6 max-h-[500px] w-full rounded-2xl object-cover shadow-soft" /><p><br></p>`;
+      document.execCommand("insertHTML", false, html);
+      handleEditorInput();
       setImageModalOpen(false);
       toast.success("Image uploaded and inserted!");
     } catch (err: any) {
@@ -300,12 +347,69 @@ export function MarkdownEditor({
     }
   };
 
-  const words = value.trim().split(/\s+/).filter(Boolean).length;
+  /**
+   * Insert Table
+   */
+  const insertTable = () => {
+    editorRef.current?.focus();
+    const tableHtml = `
+      <table class="my-6 w-full border-collapse">
+        <thead>
+          <tr class="border-b border-border bg-secondary/40 font-semibold">
+            <th class="p-3 border border-border">Header 1</th>
+            <th class="p-3 border border-border">Header 2</th>
+            <th class="p-3 border border-border">Header 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="p-3 border border-border">Row 1, Cell 1</td>
+            <td class="p-3 border border-border">Row 1, Cell 2</td>
+            <td class="p-3 border border-border">Row 1, Cell 3</td>
+          </tr>
+          <tr>
+            <td class="p-3 border border-border">Row 2, Cell 1</td>
+            <td class="p-3 border border-border">Row 2, Cell 2</td>
+            <td class="p-3 border border-border">Row 2, Cell 3</td>
+          </tr>
+        </tbody>
+      </table>
+      <p><br></p>
+    `;
+    document.execCommand("insertHTML", false, tableHtml);
+    handleEditorInput();
+  };
+
+  // Metrics
+  const textContent = editorRef.current?.innerText || value.replace(/<[^>]+>/g, "");
+  const words = textContent.trim().split(/\s+/).filter(Boolean).length;
 
   return (
     <div className="relative rounded-2xl border border-border bg-background shadow-soft">
-      {/* Toolbar Header */}
+      {/* WordPress-style Rich Toolbar */}
       <div className="flex flex-wrap items-center gap-1 border-b border-border bg-secondary/30 p-2 backdrop-blur-sm">
+        {/* Undo / Redo */}
+        <button
+          type="button"
+          title="Undo (Ctrl+Z)"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => exec("undo")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <Undo className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          title="Redo (Ctrl+Y)"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => exec("redo")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <Redo className="h-4 w-4" />
+        </button>
+
+        <div className="mx-1 h-5 w-px bg-border" />
+
         {/* Headings Dropdown (H1 - H6) */}
         <div className="relative">
           <button
@@ -316,7 +420,7 @@ export function MarkdownEditor({
               e.stopPropagation();
               setHeadingOpen((o) => !o);
             }}
-            className={`flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-colors ${
+            className={`flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold transition-colors ${
               headingOpen
                 ? "bg-secondary text-foreground"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground"
@@ -369,33 +473,43 @@ export function MarkdownEditor({
 
         <div className="mx-1 h-5 w-px bg-border" />
 
-        {/* Text Formatting Tools */}
+        {/* Inline Formatting: Bold, Italic, Underline, Strike, Code */}
         <button
           type="button"
-          title="Bold"
+          title="Bold (Ctrl+B)"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => applyInline("**", "**", "bold text")}
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={() => exec("bold")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Bold className="h-4 w-4" />
         </button>
 
         <button
           type="button"
-          title="Italic"
+          title="Italic (Ctrl+I)"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => applyInline("_", "_", "italic text")}
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={() => exec("italic")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Italic className="h-4 w-4" />
         </button>
 
         <button
           type="button"
+          title="Underline (Ctrl+U)"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => exec("underline")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <Underline className="h-4 w-4" />
+        </button>
+
+        <button
+          type="button"
           title="Strikethrough"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => applyInline("~~", "~~", "strikethrough text")}
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={() => exec("strikeThrough")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Strikethrough className="h-4 w-4" />
         </button>
@@ -404,10 +518,41 @@ export function MarkdownEditor({
           type="button"
           title="Inline Code"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => applyInline("`", "`", "code")}
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={applyInlineCode}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Code className="h-4 w-4" />
+        </button>
+
+        <div className="mx-1 h-5 w-px bg-border" />
+
+        {/* Text Alignment */}
+        <button
+          type="button"
+          title="Align Left"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => exec("justifyLeft")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <AlignLeft className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          title="Align Center"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => exec("justifyCenter")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <AlignCenter className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          title="Align Right"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => exec("justifyRight")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <AlignRight className="h-4 w-4" />
         </button>
 
         <div className="mx-1 h-5 w-px bg-border" />
@@ -417,8 +562,8 @@ export function MarkdownEditor({
           type="button"
           title="Bullet List"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => applyBlockPrefix("- ", "List item")}
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={() => exec("insertUnorderedList")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <List className="h-4 w-4" />
         </button>
@@ -427,18 +572,18 @@ export function MarkdownEditor({
           type="button"
           title="Numbered List"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => applyBlockPrefix("1. ", "List item")}
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={() => exec("insertOrderedList")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <ListOrdered className="h-4 w-4" />
         </button>
 
         <button
           type="button"
-          title="Quote Block"
+          title="Blockquote"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => applyBlockPrefix("> ", "Quote")}
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={() => exec("formatBlock", "<blockquote>")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Quote className="h-4 w-4" />
         </button>
@@ -447,10 +592,20 @@ export function MarkdownEditor({
           type="button"
           title="Insert Link"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={openLinkModal}
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={openLink}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Link2 className="h-4 w-4" />
+        </button>
+
+        <button
+          type="button"
+          title="Remove Link"
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={removeLink}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        >
+          <Unlink className="h-3.5 w-3.5" />
         </button>
 
         <div className="mx-1 h-5 w-px bg-border" />
@@ -460,8 +615,8 @@ export function MarkdownEditor({
           type="button"
           title="Insert Image (Upload or URL)"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={openImageModal}
-          className="flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={openImage}
+          className="flex h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <ImageIcon className="h-4 w-4 text-emerald-500" />
           <span>Image</span>
@@ -471,8 +626,8 @@ export function MarkdownEditor({
           type="button"
           title="Insert Video (Upload or YouTube/Vimeo/URL)"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={openVideoModal}
-          className="flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={openVideo}
+          className="flex h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Video className="h-4 w-4 text-rose-500" />
           <span>Video</span>
@@ -480,13 +635,13 @@ export function MarkdownEditor({
 
         <div className="mx-1 h-5 w-px bg-border" />
 
-        {/* Snippets */}
+        {/* Horizontal Divider & Table */}
         <button
           type="button"
-          title="Divider Line"
+          title="Horizontal Rule / Divider"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() => insertSnippet("\n\n---\n\n")}
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={() => exec("insertHorizontalRule")}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Minus className="h-4 w-4" />
         </button>
@@ -495,57 +650,82 @@ export function MarkdownEditor({
           type="button"
           title="Insert Table"
           onMouseDown={(e) => e.preventDefault()}
-          onClick={() =>
-            insertSnippet(
-              "\n\n| Column 1 | Column 2 | Column 3 |\n| --- | --- | --- |\n| Cell 1 | Cell 2 | Cell 3 |\n| Cell 4 | Cell 5 | Cell 6 |\n\n"
-            )
-          }
-          className="grid h-9 w-9 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          onClick={insertTable}
+          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
           <Table className="h-4 w-4" />
         </button>
 
-        {/* Preview Toggle */}
-        <button
-          type="button"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => setPreview((p) => !p)}
-          className={`ml-auto flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-            preview
-              ? "bg-ink text-ink-foreground shadow-sm"
-              : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-          }`}
-        >
-          {preview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          <span>{preview ? "Edit" : "Preview"}</span>
-        </button>
+        {/* View Mode Toggle: Visual / Code / Preview */}
+        <div className="ml-auto flex items-center rounded-lg bg-secondary/60 p-0.5 text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setMode("visual")}
+            className={`rounded-md px-2.5 py-1 transition-all ${
+              mode === "visual" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Visual
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("code")}
+            className={`rounded-md px-2.5 py-1 transition-all ${
+              mode === "code" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            HTML / Code
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("preview")}
+            className={`flex items-center gap-1 rounded-md px-2.5 py-1 transition-all ${
+              mode === "preview" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Eye className="h-3.5 w-3.5" />
+            <span>Preview</span>
+          </button>
+        </div>
       </div>
 
-      {/* Editor / Preview Body */}
-      {preview ? (
-        <div className="min-h-[460px] p-6 lg:p-8">
-          <Markdown content={value || "_Nothing to preview yet. Start typing or use tools above._"} />
-        </div>
-      ) : (
-        <textarea
-          ref={ref}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          rows={22}
-          placeholder="Write your article in markdown. Use the toolbar above for headings, bold, links, videos, images..."
-          className="w-full resize-y bg-transparent p-5 font-mono text-sm leading-relaxed text-foreground outline-none placeholder:text-muted-foreground/40"
+      {/* Main Editing / Preview Canvas */}
+      {mode === "visual" && (
+        <div
+          ref={editorRef}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={handleEditorInput}
+          className="prose-agency min-h-[460px] p-6 lg:p-8 outline-none focus:ring-0 text-foreground"
+          style={{ minHeight: "460px" }}
         />
       )}
 
-      {/* Footer Info */}
+      {mode === "code" && (
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          rows={22}
+          placeholder="Raw HTML content..."
+          className="w-full resize-y bg-transparent p-6 font-mono text-xs leading-relaxed text-foreground outline-none"
+        />
+      )}
+
+      {mode === "preview" && (
+        <div className="min-h-[460px] p-6 lg:p-8">
+          <Markdown content={value || "<p><em>Nothing to preview yet. Start typing in Visual mode!</em></p>"} />
+        </div>
+      )}
+
+      {/* Editor Footer */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border bg-secondary/10 px-5 py-3 text-xs text-muted-foreground">
         <div className="flex items-center gap-4">
           <span>{words} words</span>
           <span>{value.length} characters</span>
-          <span>{readingTime(value)} min read</span>
+          <span>{readingTime(textContent)} min read</span>
         </div>
         <div className="text-[11px] text-muted-foreground/70">
-          Supports Markdown, HTML5 video, YouTube, and Vimeo embeds
+          WordPress-style Visual Editor · Real-time styling & media embeds
         </div>
       </div>
 

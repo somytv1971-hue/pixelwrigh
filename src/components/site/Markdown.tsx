@@ -45,7 +45,16 @@ function getVimeoEmbedUrl(url: string): string | null {
   return null;
 }
 
+function isHtmlContent(str: string): boolean {
+  if (!str) return false;
+  return /<(p|h1|h2|h3|h4|h5|h6|div|video|iframe|blockquote|ul|ol|table|strong|em|img|hr)\b[^>]*>/i.test(str);
+}
+
 export function Markdown({ content, className }: { content: string; className?: string }) {
+  if (isHtmlContent(content)) {
+    return <div className={`prose-agency ${className ?? ""}`} dangerouslySetInnerHTML={{ __html: content }} />;
+  }
+
   return (
     <div className={`prose-agency ${className ?? ""}`}>
       <ReactMarkdown

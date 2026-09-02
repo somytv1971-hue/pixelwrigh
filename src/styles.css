@@ -296,9 +296,14 @@
     margin-bottom: 1.25rem;
     font-size: 0.9rem;
   }
-  & code {
-    font-family: ui-monospace, monospace;
-    font-size: 0.9em;
+  & hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+  & strong {
+    font-weight: 700;
+    color: var(--foreground);
   }
   & table {
     width: 100%;
