@@ -1,15 +1,16 @@
 export const site = {
   name: "Pixelwright",
   tagline: "Digital design & development agency",
-  email: "mdradyan30@gmail.com",
-  phone: "01568793292",
-  office: "Dhaka, Bangladesh",
-  officeLabel: "MAIN OFFICE",
+  email: "",
+  phone: "",
+  meetingUrl: "https://calendly.com/rjrisuan/30min",
+  office: "Global Remote Team | Available across US, UK & Australian Timezones",
+  officeLabel: "GLOBAL REACH",
   year: 2026,
   socials: [
-    { label: "Dribbble", href: "https://dribbble.com" },
-    { label: "GitHub", href: "https://github.com" },
-    { label: "YouTube", href: "https://youtube.com" },
+    { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61593384363062" },
+    { label: "Instagram", href: "https://www.instagram.com/pixel_wright/" },
+    { label: "Twitter", href: "https://x.com/MdRisuan" },
     { label: "LinkedIn", href: "https://linkedin.com" },
   ],
 };

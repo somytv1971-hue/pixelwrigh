@@ -11,10 +11,10 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          `${site.name} is a small senior studio in Dhaka designing and building websites, SaaS products and automation systems.`,
+          `${site.name} is a global remote studio designing and building websites, SaaS products and automation systems.`,
       },
       { property: "og:title", content: `About — ${site.name}` },
-      { property: "og:description", content: "A small senior studio obsessed with craft and outcomes." },
+      { property: "og:description", content: "A global remote studio obsessed with craft and outcomes." },
     ],
   }),
   component: About,
@@ -57,9 +57,9 @@ function About() {
           <Words text="that feel alive" className="text-gradient" />
         </h1>
         <p className="mt-8 max-w-2xl text-lg text-muted-foreground">
-          {site.name} is a design and development studio in {site.office}. We work with founders and marketing
-          teams who care as much about the details as we do — combining product thinking, interface craft and
-          automation into one delivery team.
+          {site.name} is a global remote design and development studio operating seamlessly across US, UK &amp;
+          Australian timezones. We work with founders and marketing teams who care as much about the details as we
+          do — combining product thinking, interface craft and automation into one delivery team.
         </p>
 
         <MaskReveal className="shadow-soft mt-16 aspect-[16/7] rounded-[2rem] bg-ink">

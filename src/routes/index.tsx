@@ -135,7 +135,7 @@ function Hero() {
           transition={{ delay: 0.5 }}
           className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
         >
-          <span className="bg-brand h-2 w-2 rounded-full" /> Available for new projects · {site.office}
+          <span className="bg-brand h-2 w-2 rounded-full" /> Available for new projects · Global Remote Team
         </motion.p>
         <h1 className="display-xl text-[3rem] sm:text-[4.5rem] lg:text-[6rem]">
           <Words text="Digital design &" />

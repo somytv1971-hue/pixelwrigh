@@ -169,24 +169,20 @@ function Contact() {
           </div>
         </form>
 
-        <div className="mt-24 grid gap-8 border-t border-border pt-12 sm:grid-cols-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Email</p>
-            <a href={`mailto:${site.email}`} className="mt-2 block text-lg font-medium">
-              {site.email}
-            </a>
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Phone</p>
-            <a href={`tel:${site.phone}`} className="mt-2 block text-lg font-medium">
-              {site.phone}
-            </a>
-          </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              {site.officeLabel}
-            </p>
-            <p className="mt-2 text-lg font-medium">{site.office}</p>
+        <div className="mt-24 border-t border-border pt-12">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Availability & Timezones
+              </p>
+              <p className="mt-2 text-base font-medium leading-relaxed">{site.office}</p>
+            </div>
+            <div className="rounded-2xl border border-border bg-secondary/30 px-6 py-3.5 sm:text-right">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                Response Time
+              </p>
+              <p className="mt-1 text-sm font-medium text-foreground">Within 24 hours on business days</p>
+            </div>
           </div>
         </div>
       </div>

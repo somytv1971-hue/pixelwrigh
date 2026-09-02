@@ -94,6 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Pixelwright is a digital design and development studio building websites, e-commerce, SaaS products and AI automation.",
       },
       { name: "author", content: site.name },
+      { name: "google-site-verification", content: "jeWFAVQi7kz9JS2WXf8eMeGrxl8WndF1yKBpqFg2hDY" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -123,6 +124,7 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <meta name="google-site-verification" content="jeWFAVQi7kz9JS2WXf8eMeGrxl8WndF1yKBpqFg2hDY" />
         <title>Pixelwright — Digital design &amp; development agency</title>
         <link rel="icon" type="image/png" href="/pixelwright.png" />
         <link rel="icon" type="image/svg+xml" href="/pixelwright.svg" />
