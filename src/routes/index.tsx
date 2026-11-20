@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Blobs, Reveal, Words, MaskReveal } from "@/components/site/Reveal";
 import { Magnetic, Parallax } from "@/components/site/Motion";
 import { EmptyState, PostCard, ProjectCard } from "@/components/site/Cards";
+import { TechBackground } from "@/components/site/TechBackground";
 import { fetchProjects, fetchPublishedPosts } from "@/lib/content";
 import { clientStats, faqs, processSteps, site, testimonials, topServices, whyCopy } from "@/lib/site";
 
@@ -50,71 +51,38 @@ const scenes = [
   { bg: "bg-scene-4", label: "Automation", caption: "Work that runs itself" },
 ];
 
-/** Auto-cycling showreel like the reference video: scenes crossfade with a slow zoom. */
-function HeroReel() {
+/** Auto-cycling label reel inside the hero. */
+function HeroLabelReel() {
   const [i, setI] = useState(0);
-  const scene = scenes[i]!;
 
   useEffect(() => {
-    const id = setInterval(() => setI((n) => (n + 1) % scenes.length), 3400);
+    const id = setInterval(() => setI((n) => (n + 1) % scenes.length), 3000);
     return () => clearInterval(id);
   }, []);
 
   return (
-    <div className="shadow-soft relative aspect-[16/8] w-full overflow-hidden rounded-[2rem] bg-ink">
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={i}
-          className={`absolute inset-0 ${scene.bg}`}
-          initial={{ opacity: 0, scale: 1.16, filter: "blur(10px)" }}
-          animate={{ opacity: 1, scale: 1.02, filter: "blur(0px)" }}
-          exit={{ opacity: 0, scale: 1, filter: "blur(6px)" }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+    <div className="mt-8 flex items-center justify-center gap-6">
+      {scenes.map((s, idx) => (
+        <motion.button
+          key={s.label}
+          type="button"
+          onClick={() => setI(idx)}
+          className={`relative text-xs font-semibold uppercase tracking-[0.22em] transition-colors duration-300 ${
+            idx === i ? "text-white" : "text-white/35 hover:text-white/55"
+          }`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <div className="absolute inset-0 grid place-items-center px-8 text-center">
-            <div>
-              <motion.p
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.6 }}
-                className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-ink-foreground/70"
-              >
-                {scene.label}
-              </motion.p>
-              <span className="mt-4 block overflow-hidden">
-                <motion.span
-                  className="font-display block text-2xl font-bold text-ink-foreground sm:text-4xl lg:text-5xl"
-                  initial={{ y: "110%", rotate: 3 }}
-                  animate={{ y: "0%", rotate: 0 }}
-                  transition={{ delay: 0.15, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  {scene.caption}
-                </motion.span>
-              </span>
-            </div>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-
-      <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 gap-2">
-        {scenes.map((s, idx) => (
-          <button
-            key={s.label}
-            type="button"
-            aria-label={s.label}
-            onClick={() => setI(idx)}
-            className="h-1 w-10 overflow-hidden rounded-full bg-ink-foreground/25"
-          >
+          {s.label}
+          {idx === i && (
             <motion.span
-              className="block h-full bg-ink-foreground/90"
-              initial={false}
-              animate={{ scaleX: idx === i ? 1 : 0 }}
-              style={{ originX: 0 }}
-              transition={{ duration: idx === i ? 3.4 : 0.3, ease: "linear" }}
+              layoutId="hero-tab"
+              className="absolute -bottom-2 left-0 right-0 mx-auto h-0.5 w-full rounded-full bg-gradient-to-r from-violet to-fuchsia"
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
             />
-          </button>
-        ))}
-      </div>
+          )}
+        </motion.button>
+      ))}
     </div>
   );
 }
@@ -122,35 +90,53 @@ function HeroReel() {
 function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
-  const y = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <section ref={ref} className="relative overflow-hidden px-5 pb-16 pt-16 lg:px-8 lg:pt-24">
-      <Blobs />
-      <div className="mx-auto max-w-5xl text-center">
+    <section ref={ref} className="hero-grain relative flex min-h-[100dvh] items-center overflow-hidden">
+      {/* ── Background layer ── */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0">
+        <TechBackground />
+      </motion.div>
+
+      {/* ── Dark overlay for text readability ── */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/20 via-transparent to-black/40" />
+
+      {/* ── Content ── */}
+      <motion.div
+        style={{ y: contentY, opacity }}
+        className="relative z-[3] mx-auto w-full max-w-5xl px-5 py-24 text-center lg:px-8"
+      >
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-4 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur"
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/70 backdrop-blur-md"
         >
-          <span className="bg-brand h-2 w-2 rounded-full" /> Available for new projects · Global Remote Team
+          <span className="h-2 w-2 rounded-full bg-gradient-to-r from-violet to-fuchsia" />
+          Available for new projects · Global Remote Team
         </motion.p>
-        <h1 className="display-xl text-[3rem] sm:text-[4.5rem] lg:text-[6rem]">
+
+        <h1 className="display-xl text-[3rem] text-white sm:text-[4.5rem] lg:text-[6rem]">
           <Words text="Digital design &" />
           <br />
-          <Words text="development agency" className="text-gradient" />
+          <span className="bg-gradient-to-r from-violet via-fuchsia to-cyan bg-clip-text text-transparent">
+            <Words text="development agency" />
+          </span>
         </h1>
+
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.75, duration: 0.8 }}
-          className="mx-auto mt-7 max-w-xl text-base text-muted-foreground sm:text-lg"
+          className="mx-auto mt-7 max-w-xl text-base text-white/60 sm:text-lg"
         >
           We design and build digital products, brands and websites for companies ready to move beyond the
           ordinary.
         </motion.p>
+
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -161,9 +147,9 @@ function Hero() {
             <Link
               to="/contact"
               data-cursor-label="Go"
-              className="bg-ink group relative flex items-center gap-2 overflow-hidden rounded-full px-7 py-3.5 text-sm font-semibold text-ink-foreground"
+              className="group relative flex items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-violet to-fuchsia px-7 py-3.5 text-sm font-semibold text-white"
             >
-              <span className="bg-brand absolute inset-0 translate-y-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
+              <span className="absolute inset-0 translate-y-full bg-white/20 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
               <span className="relative">Start a project</span>
               <ArrowRight className="relative h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
@@ -171,20 +157,25 @@ function Hero() {
           <Magnetic>
             <Link
               to="/our-work"
-              className="group relative flex items-center overflow-hidden rounded-full border border-border px-7 py-3.5 text-sm font-semibold"
+              className="group relative flex items-center overflow-hidden rounded-full border border-white/20 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm"
             >
-              <span className="absolute inset-0 translate-y-full bg-secondary transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
+              <span className="absolute inset-0 translate-y-full bg-white/10 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
               <span className="relative">See our work</span>
             </Link>
           </Magnetic>
         </motion.div>
-      </div>
 
-      <motion.div style={{ scale, y }} className="mx-auto mt-16 w-full max-w-6xl">
-        <MaskReveal className="rounded-[2rem]">
-          <HeroReel />
-        </MaskReveal>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 0.8 }}
+        >
+          <HeroLabelReel />
+        </motion.div>
       </motion.div>
+
+      {/* ── Bottom fade to page background ── */}
+      <div className="absolute inset-x-0 bottom-0 z-[2] h-32 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 }
