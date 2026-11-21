@@ -114,7 +114,7 @@ export function TechBackground() {
         }
       }
 
-      // Draw and update nodes
+      
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         if (!n) continue;
