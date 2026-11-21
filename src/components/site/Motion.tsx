@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useSpring, useScroll, useTransform } from "motion/react";
 import { useRef, type ReactNode } from "react";
 
-/** Cuberto-style magnetic element: gently pulls toward the cursor and springs back. */
+
 export function Magnetic({
   children,
   className,

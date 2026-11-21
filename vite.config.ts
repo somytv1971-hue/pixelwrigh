@@ -8,8 +8,7 @@ import path from "node:path";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { loadEnv } from "vite";
 
-// Load all env vars (no prefix) into process.env for server-side routes only.
-// Never expose these to the client bundle.
+
 const serverEnv = loadEnv(process.env["NODE_ENV"] ?? "development", process.cwd(), "");
 Object.assign(process.env, serverEnv);
 
