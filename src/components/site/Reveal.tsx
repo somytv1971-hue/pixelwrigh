@@ -25,10 +25,7 @@ export function Reveal({
   );
 }
 
-/**
- * Masked per-word entrance (Cuberto headline reveal). Words slide up from behind
- * a clipping mask, staggered, and trigger when the heading scrolls into view.
- */
+
 export function Words({
   text,
   className,
