@@ -119,7 +119,7 @@ export function TechBackground() {
         const n = nodes[i];
         if (!n) continue;
 
-        // Wave float motion
+        
         n.x += n.vx + Math.sin(time + n.pulsePhase) * 0.3;
         n.y += n.vy + Math.cos(time + n.pulsePhase) * 0.3;
 
