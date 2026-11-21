@@ -114,16 +114,15 @@ export function TechBackground() {
         }
       }
 
-      
+
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         if (!n) continue;
 
-        
+
         n.x += n.vx + Math.sin(time + n.pulsePhase) * 0.3;
         n.y += n.vy + Math.cos(time + n.pulsePhase) * 0.3;
 
-        // Bounce from borders
         if (n.x < 0 || n.x > width) n.vx *= -1;
         if (n.y < 0 || n.y > height) n.vy *= -1;
 
