@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-/**
- * Cuberto-style cursor: a solid dot plus a lagging gradient blob that grows and
- * shows a contextual label ("View", "Open", "Read") on interactive elements.
- */
+
 export function Cursor() {
   const ringRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
